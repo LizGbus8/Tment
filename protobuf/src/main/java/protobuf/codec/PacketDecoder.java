@@ -30,7 +30,7 @@ public class PacketDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
-
+        int i = buffer.readableBytes();
         while (true) {
             /** 数据包小于最小长度，退出循环 */
             if (buffer.readableBytes() < PACKET_LENTH) {

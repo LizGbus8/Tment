@@ -1,12 +1,11 @@
 package protobuf.codec;
 
-import com.google.protobuf.Message;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
-import org.junit.Assert;
 import org.junit.Test;
-import protobuf.analysis.ParseMap;
+import protobuf.ParseRegistryMap;
+import protobuf.generate.internal.Internal;
 
 import java.io.IOException;
 
@@ -20,22 +19,36 @@ public class PacketDecoderTest {
     @Test
     public void decode() throws IOException {
 
+        ParseRegistryMap.initRegistry();
+
         /** 包装数据 */
-        int ptoNum = 1004;
-        String msg = "hello world";
-        byte[] data = msg.getBytes();
+        int ptoNum = 1000;
+        Internal.GTransfer.Builder builder = Internal.GTransfer.newBuilder();
+        builder.setDest(Internal.Dest.Gate)
+                .setNetId(12)
+                .setPtoNum(1000)
+                .setUserId("837")
+                .setMsg(com.google.protobuf.ByteString.copyFrom("hello".getBytes()));
+
+
+        Internal.GTransfer gTransfer = builder.build();
+
         ByteBuf buf = Unpooled.buffer();
         buf.writeInt(Constants.MAGIC_NUMBER);
         buf.writeInt(ptoNum);
-        buf.writeBytes(data);
+        buf.writeInt(gTransfer.toByteArray().length);
+        buf.writeBytes(gTransfer.toByteArray());
+
         ByteBuf input = buf.duplicate();//复制当前对象，复制后的对象与前对象共享缓冲区，且维护自己的独立索引
 
-        Message message = ParseMap.getMessage(ptoNum, data);
         EmbeddedChannel channel = new EmbeddedChannel(new PacketDecoder());
 
+        channel.writeInbound(input);
+
+        Object o = channel.readOutbound();
+        System.out.println(o);
         //验证写数据返回True
-        Assert.assertTrue(channel.writeInbound(message));
-        Assert.assertTrue(channel.finish());
+        channel.finish();
         //每次读3个数据
 //        Assert.assertEquals(buf.readBytes(3), channel.readInbound());
 //        Assert.assertEquals(buf.readBytes(3), channel.readInbound());
