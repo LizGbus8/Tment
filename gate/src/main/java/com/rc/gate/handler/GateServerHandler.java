@@ -1,5 +1,6 @@
 package com.rc.gate.handler;
 
+import com.rc.gate.session.ClientConnection;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.slf4j.Logger;
@@ -13,8 +14,6 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(GateServerHandler.class);
 
-    public static int a = 1;
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         //保存客户端连接
@@ -22,6 +21,7 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
+
     }
 
     @Override

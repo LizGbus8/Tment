@@ -7,6 +7,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
+import protobuf.codec.PacketDecoder;
+import protobuf.codec.PacketEncoder;
 
 /**
  * 作者：LizG on 2018/8/16 22:56
@@ -27,6 +29,8 @@ public class GateServer {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast("MessageDecoder",new PacketEncoder());
+                        ch.pipeline().addLast("MessageEncoder",new PacketDecoder());
                         ch.pipeline().addLast();
                     }
                 });
